@@ -1,0 +1,10 @@
+- name: 检查 Docker 容器状态
+  hosts: all
+  tasks:
+    - name: 列出运行中的容器
+      command: docker ps
+      register: result
+    
+    - name: 输出结果
+      debug:
+        var: result.stdout_lines

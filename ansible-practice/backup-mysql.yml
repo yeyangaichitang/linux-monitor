@@ -1,0 +1,31 @@
+- name: MySQL 自动备份
+  hosts: all
+  tasks:
+    - name: 创建备份目录
+      file:
+        path: /opt/backups
+        state: directory
+
+    - name: 备份 MySQL 数据库
+      command: >
+        docker exec docker-practice-db-1
+        mysqldump -uroot -pRoot123456 --databases devops
+      register: backup_result
+
+    - name: 写入备份文件
+      copy:
+        content: "{{ backup_result.stdout }}"
+        dest: "/opt/backups/devops-{{ ansible_date_time.date }}.sql"
+
+    - name: 清理 7 天前的备份
+      find:
+        paths: /opt/backups
+        patterns: "*.sql"
+        age: 7d
+      register: old_files
+
+    - name: 删除旧备份
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_files.files }}"

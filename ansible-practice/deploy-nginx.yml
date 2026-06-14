@@ -1,0 +1,13 @@
+- name: 部署 Nginx
+  hosts: all
+  tasks:
+    - name: 安装 Nginx
+      dnf:
+        name: nginx
+        state: present
+    
+    - name: 启动 Nginx
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
